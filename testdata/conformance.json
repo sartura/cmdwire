@@ -1,0 +1,204 @@
+{
+  "version": 1,
+  "valid": [
+    {
+      "line": "request object.status",
+      "record": {"kind": "request", "command": "object.status"}
+    },
+    {
+      "line": "request object.observe count=2 timeout=30",
+      "record": {
+        "kind": "request",
+        "command": "object.observe",
+        "fields": [
+          {"name": "count", "value": "2"},
+          {"name": "timeout", "value": "30"}
+        ]
+      }
+    },
+    {
+      "line": "request object.action alpha mode=fast",
+      "record": {
+        "kind": "request",
+        "command": "object.action",
+        "resource": "alpha",
+        "fields": [{"name": "mode", "value": "fast"}]
+      }
+    },
+    {
+      "line": "request object.action alpha.v1 mode=fast",
+      "record": {
+        "kind": "request",
+        "command": "object.action",
+        "resource": "alpha.v1",
+        "fields": [{"name": "mode", "value": "fast"}]
+      }
+    },
+    {
+      "line": "request object.action Alpha/V1 mode=fast",
+      "record": {
+        "kind": "request",
+        "command": "object.action",
+        "resource": "Alpha/V1",
+        "fields": [{"name": "mode", "value": "fast"}]
+      }
+    },
+    {
+      "line": "ok object.action schema=1 count=0 state=ready",
+      "record": {
+        "kind": "ok",
+        "command": "object.action",
+        "fields": [
+          {"name": "schema", "value": "1"},
+          {"name": "count", "value": "0"},
+          {"name": "state", "value": "ready"}
+        ]
+      }
+    },
+    {
+      "line": "ok object.status schema=1 count=2 stop=count",
+      "record": {
+        "kind": "ok",
+        "command": "object.status",
+        "fields": [
+          {"name": "schema", "value": "1"},
+          {"name": "count", "value": "2"},
+          {"name": "stop", "value": "count"}
+        ]
+      }
+    },
+    {
+      "line": "err object.action code=BAD_VALUE field=mode",
+      "record": {
+        "kind": "err",
+        "command": "object.action",
+        "fields": [
+          {"name": "code", "value": "BAD_VALUE"},
+          {"name": "field", "value": "mode"}
+        ]
+      }
+    },
+    {
+      "line": "notice system.boot storage state=ready",
+      "record": {
+        "kind": "notice",
+        "command": "system.boot",
+        "resource": "storage",
+        "fields": [{"name": "state", "value": "ready"}]
+      }
+    },
+    {
+      "line": "event object.observe state=waiting",
+      "record": {
+        "kind": "event",
+        "command": "object.observe",
+        "fields": [{"name": "state", "value": "waiting"}]
+      }
+    },
+    {
+      "line": "event object.observe alpha/telemetry phase=sampled",
+      "record": {
+        "kind": "event",
+        "command": "object.observe",
+        "resource": "alpha/telemetry",
+        "fields": [{"name": "phase", "value": "sampled"}]
+      }
+    },
+    {
+      "line": "item object.status alpha",
+      "record": {
+        "kind": "item",
+        "command": "object.status",
+        "resource": "alpha"
+      }
+    },
+    {
+      "line": "item object.status state=ready mode=automatic",
+      "record": {
+        "kind": "item",
+        "command": "object.status",
+        "fields": [
+          {"name": "state", "value": "ready"},
+          {"name": "mode", "value": "automatic"}
+        ]
+      }
+    },
+    {
+      "line": "chunk object.read alpha/data offset=4 data=44556677",
+      "record": {
+        "kind": "chunk",
+        "command": "object.read",
+        "resource": "alpha/data",
+        "fields": [
+          {"name": "offset", "value": "4"},
+          {"name": "data", "value": "44556677"}
+        ]
+      }
+    },
+    {
+      "line": "request object.set value=a/b:c._-",
+      "record": {
+        "kind": "request",
+        "command": "object.set",
+        "fields": [{"name": "value", "value": "a/b:c._-"}]
+      }
+    },
+    {
+      "line": "request object.set k==",
+      "record": {
+        "kind": "request",
+        "command": "object.set",
+        "fields": [{"name": "k", "value": "="}]
+      }
+    }
+  ],
+  "invalid": [
+    {"line": ""},
+    {"line": " request object.status"},
+    {"line": "request object.status "},
+    {"line": "request  object.status"},
+    {"line": "request\tobject.status"},
+    {"line": "cmd object.status"},
+    {"line": "run object.status"},
+    {"line": "request Object.status"},
+    {"line": "request object..status"},
+    {"line": "request object.status alpha beta"},
+    {"line": "request object.status .."},
+    {"line": "request object.status alpha..beta"},
+    {"line": "request object.status alpha.beta.gamma"},
+    {"line": "request object.status -"},
+    {"line": "request object.status :::::::"},
+    {"line": "request object.status _alpha"},
+    {"line": "request object.status alpha_"},
+    {"line": "request object.set value="},
+    {"line": "request object.set value=\"ready\""},
+    {"line": "request object.set value=a\\b"},
+    {"line": "request object.set value=caf\u00e9"},
+    {"line": "request object.set value=two words"},
+    {"line": "request a k=v x"},
+    {"line": "ok object.status"},
+    {"line": "ok object.status schema=1"},
+    {"line": "ok object.status count=0 schema=1"},
+    {"line": "ok object.status state=ready schema=1 count=0"},
+    {"line": "ok object.status schema=0 count=0"},
+    {"line": "ok object.status schema=01 count=0"},
+    {"line": "ok object.status schema=1 count=00"},
+    {"line": "ok object.status schema=1 count=+1"},
+    {"line": "ok object.status schema=18446744073709551616 count=0"},
+    {"line": "ok object.status schema=1 count=18446744073709551616"},
+    {"line": "ok object.status alpha schema=1 count=0"},
+    {"line": "ok object.status schema=1 count=0 state=ready state=again"},
+    {"line": "err object.action"},
+    {"line": "err object.action alpha code=FAILED"},
+    {"line": "err object.action field=mode code=BAD_VALUE"},
+    {"line": "err object.action code=bad"},
+    {"line": "err object.action code=BAD code=AGAIN"},
+    {"line": "notice system.boot"},
+    {"line": "notice system.boot storage"},
+    {"line": "event object.observe"},
+    {"line": "chunk object.read alpha/data"},
+    {"line": "item object.status alpha//telemetry state=ready"},
+    {"line": "request object.status Bad=1"},
+    {"line": "item object.status resource value=123456789012345678901234567890123456789012345678901234567890"}
+  ]
+}

@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+
+if [ ! -f go.mod ] || \
+    ! grep -q '^module github.com/sartura/cmdwire$' go.mod; then
+    echo "run scripts/fuzz-campaign from the cmdwire" \
+        "repository root" >&2
+    exit 2
+fi
+
+export GOWORK=off
+
+fuzz_time=${FUZZ_TIME:-2h}
+fuzz_timeout=${FUZZ_TIMEOUT:-2h15m}
+fuzz_parallel=${FUZZ_PARALLEL:-7}
+
+for target in FuzzParseLine FuzzFormat FuzzDecoder FuzzCollector FuzzParseSchema; do
+    echo "Fuzzing $target for $fuzz_time"
+    go test \
+        -fuzz="^${target}$" \
+        -fuzztime="$fuzz_time" \
+        -timeout="$fuzz_timeout" \
+        -parallel="$fuzz_parallel" \
+        .
+done

@@ -1,0 +1,15 @@
+# Build artifacts
+/cmdwire
+/bin/
+/y.output
+/target/
+/rust/cmdwire/target/
+
+# Test artifacts
+*.out
+
+# Editor files
+*.sw*
+
+# macOS Finder files
+.DS_Store

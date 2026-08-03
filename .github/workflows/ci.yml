@@ -1,0 +1,88 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - run: go generate ./...
+      - run: git diff --exit-code -- parser_gen.go
+      - run: go test -race ./...
+      - run: go vet ./...
+
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: dtolnay/rust-toolchain@1.97.1
+        with:
+          components: rustfmt, clippy
+          targets: aarch64-unknown-none
+      - run: go run ./cmd/cmdwire schema generate-rust rust/cmdwire/tests/generated/mod.rs testdata/schema/object.action.json testdata/schema/object.list.json testdata/schema/object.status.json
+      - run: git diff --exit-code -- rust/cmdwire/tests/generated/mod.rs
+      - run: rustfmt --edition 2024 --check rust/cmdwire/src/lib.rs rust/cmdwire/src/bin/parser_oracle.rs rust/cmdwire/tests/conformance.rs rust/cmdwire/tests/encoding.rs
+      - run: rustfmt --edition 2024 --config skip_children=true --check rust/cmdwire/tests/generated_bindings.rs
+      - run: cargo test --locked --manifest-path rust/cmdwire/Cargo.toml --all-features
+      - run: cargo clippy --locked --manifest-path rust/cmdwire/Cargo.toml --all-targets --all-features -- -D warnings
+      - run: cargo check --locked --manifest-path rust/cmdwire/Cargo.toml --target aarch64-unknown-none
+
+  gherkin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: features/go.mod
+          cache-dependency-path: features/go.sum
+          cache: true
+      - run: go test ./...
+        working-directory: features
+
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: dtolnay/rust-toolchain@1.97.1
+      - run: ./scripts/fuzz-campaign
+        env:
+          GOMAXPROCS: 1
+          FUZZ_TIME: 10s
+          FUZZ_TIMEOUT: 2m
+          FUZZ_PARALLEL: 1
+      - run: ./scripts/differential-fuzz
+
+  mutation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - run: go generate ./...
+      - run: ./scripts/mutation-check
+        env:
+          GOMAXPROCS: 1
+          MUTATION_WORKERS: 1
+          MUTATION_TEST_CPU: 1

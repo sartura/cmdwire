@@ -1,0 +1,79 @@
+#!/bin/sh
+set -eu
+
+if [ "$#" -ne 0 ]; then
+    echo "configure scripts/mutation-check with MUTATION_* environment variables" >&2
+    exit 2
+fi
+
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$root"
+export GOWORK=off
+
+workers=${MUTATION_WORKERS:-7}
+test_cpu=${MUTATION_TEST_CPU:-1}
+timeout_coefficient=${MUTATION_TIMEOUT_COEFFICIENT:-20}
+dry_run=${MUTATION_DRY_RUN:-0}
+integration=${MUTATION_INTEGRATION:-0}
+
+if [ "$dry_run" = 1 ]; then
+    efficacy=${MUTATION_EFFICACY:-0}
+    coverage=${MUTATION_COVERAGE:-0}
+else
+    efficacy=${MUTATION_EFFICACY:-90}
+    coverage=${MUTATION_COVERAGE:-90}
+fi
+
+set -- \
+    --workers="$workers" \
+    --test-cpu="$test_cpu" \
+    --timeout-coefficient="$timeout_coefficient" \
+    --threshold-efficacy="$efficacy" \
+    --threshold-mcover="$coverage"
+
+case "$dry_run" in
+    0) ;;
+    1) set -- "$@" --dry-run ;;
+    *) echo "MUTATION_DRY_RUN must be 0 or 1" >&2; exit 2 ;;
+esac
+case "$integration" in
+    0) ;;
+    1) set -- "$@" --integration ;;
+    *) echo "MUTATION_INTEGRATION must be 0 or 1" >&2; exit 2 ;;
+esac
+
+if [ -n "${MUTATION_DIFF:-}" ]; then
+    set -- "$@" --diff="$MUTATION_DIFF"
+fi
+if [ -n "${MUTATION_OUTPUT:-}" ]; then
+    set -- "$@" --output="$MUTATION_OUTPUT"
+fi
+if [ -n "${MUTATION_OUTPUT_STATUSES:-}" ]; then
+    set -- "$@" --output-statuses="$MUTATION_OUTPUT_STATUSES"
+fi
+if [ -n "${MUTATION_TAGS:-}" ]; then
+    set -- "$@" --tags="$MUTATION_TAGS"
+fi
+if [ -n "${MUTATION_COVERPKG:-}" ]; then
+    set -- "$@" --coverpkg="$MUTATION_COVERPKG"
+fi
+
+operators=${MUTATION_OPERATORS:-}
+while [ -n "$operators" ]; do
+    case "$operators" in
+        *,*) operator=${operators%%,*}; operators=${operators#*,} ;;
+        *) operator=$operators; operators= ;;
+    esac
+    case "$operator" in
+        invert-assignments|invert-bitwise|invert-bwassign|\
+        invert-logical|invert-loopctrl|remove-self-assignments)
+            set -- "$@" --"$operator"
+            ;;
+        *)
+            echo "unsupported MUTATION_OPERATORS entry: $operator" >&2
+            exit 2
+            ;;
+    esac
+done
+
+exec go run github.com/go-gremlins/gremlins/cmd/gremlins@v0.6.0 unleash "$@"

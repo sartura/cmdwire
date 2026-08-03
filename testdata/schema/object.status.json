@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "command": "object.status",
+  "version": 1,
+  "request": {},
+  "reply": {}
+}

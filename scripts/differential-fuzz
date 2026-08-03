@@ -1,0 +1,24 @@
+#!/bin/sh
+set -eu
+
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$root"
+export GOWORK=off
+
+if [ "$#" -eq 0 ]; then
+    set -- "$(go env GOCACHE)/fuzz/github.com/sartura/cmdwire/FuzzParseLine"
+fi
+
+for corpus in "$@"; do
+    if [ ! -d "$corpus" ]; then
+        echo "fuzz corpus not found: $corpus" >&2
+        echo "run the FuzzParseLine target first" >&2
+        exit 1
+    fi
+done
+
+cargo build --quiet --locked --manifest-path rust/cmdwire/Cargo.toml \
+    --features oracle --bin parser-oracle
+
+exec go run ./internal/differential \
+    target/debug/parser-oracle testdata/conformance.json "$@"

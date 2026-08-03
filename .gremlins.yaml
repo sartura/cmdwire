@@ -1,0 +1,4 @@
+unleash:
+  exclude-files:
+    - "parser_gen.go$"
+    - "^internal/fuzzreport/"

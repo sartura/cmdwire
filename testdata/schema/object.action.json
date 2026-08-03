@@ -1,0 +1,91 @@
+{
+  "format": 1,
+  "command": "object.action",
+  "version": 1,
+  "request": {
+    "resource": "alpha",
+    "fields": [
+      {
+        "name": "enabled",
+        "type": "bool",
+        "required": true
+      },
+      {
+        "name": "limit",
+        "type": "uint",
+        "minimum": 1,
+        "maximum": 100
+      },
+      {
+        "name": "mode",
+        "type": "enum",
+        "values": ["fast", "safe"]
+      },
+      {
+        "name": "address",
+        "type": "hex",
+        "width": 8
+      }
+    ]
+  },
+  "reply": {
+    "records": [
+      {
+        "kind": "item",
+        "resource": "state",
+        "fields": [
+          {
+            "name": "state",
+            "type": "enum",
+            "required": true,
+            "values": ["ready", "busy"]
+          },
+          {
+            "name": "counter",
+            "type": "hex",
+            "required": true,
+            "width": 8
+          }
+        ]
+      },
+      {
+        "kind": "item",
+        "resource": "telemetry",
+        "fields": [
+          {
+            "name": "reading",
+            "type": "uint",
+            "required": true,
+            "maximum": 1000,
+            "unavailable": true
+          },
+          {
+            "name": "note",
+            "type": "token"
+          }
+        ]
+      }
+    ],
+    "terminal": [
+      {
+        "name": "changed",
+        "type": "bool",
+        "required": true
+      }
+    ]
+  },
+  "errors": [
+    {
+      "code": "BAD_REQUEST",
+      "fields": [
+        {
+          "name": "field",
+          "type": "token"
+        }
+      ]
+    },
+    {
+      "code": "BUSY"
+    }
+  ]
+}

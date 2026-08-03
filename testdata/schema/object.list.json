@@ -1,0 +1,45 @@
+{
+  "format": 2,
+  "command": "object.list",
+  "version": 1,
+  "request": {},
+  "reply": {
+    "records": [
+      {
+        "kind": "item",
+        "resource": "entry",
+        "fields": [
+          {
+            "name": "name",
+            "type": "token",
+            "required": true
+          },
+          {
+            "name": "value",
+            "type": "uint"
+          },
+          {
+            "name": "data",
+            "type": "bytes"
+          }
+        ],
+        "occurs": {
+          "minimum": 1,
+          "maximum": 3
+        }
+      }
+    ],
+    "terminal": [
+      {
+        "name": "complete",
+        "type": "bool",
+        "required": true
+      }
+    ]
+  },
+  "errors": [
+    {
+      "code": "BAD_REQUEST"
+    }
+  ]
+}
